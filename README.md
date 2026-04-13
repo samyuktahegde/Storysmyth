@@ -22,7 +22,7 @@ Phase | Component     |  Description    | Status
 
 ## Project Structure
 ```
-└── 📁storysmyth
+└── 📁Storysmyth
     └── 📁data
         ├── fantasy_names.csv
     └── README.md
@@ -48,7 +48,7 @@ Converts raw name strings into sequences of tokens for the model, and converts t
 - Special characters are treated the same as letters
 - There are no special tokens at this stage
 - Encoding raises a KeyError on unknown characters
-- Vocabulary is saved as a jason file `token_to_id`
+- Vocabulary is saved as a json file `token_to_id`
 ### Data Pipeline
 Planned
 ### Model
