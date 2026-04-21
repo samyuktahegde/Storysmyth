@@ -16,7 +16,7 @@ It takes a corpus of fantasy names, learns the patterns and generates similar na
 
 Phase | Component     |  Description    | Status
 |---|---|---|---|
-1     |  Tokenizer     |  Convert names to integers and back | Planned
+1     |  Tokenizer     |  Convert names to integers and back | Done
 2     |  Data Pipeline      |  Load, clean, encode, and batch training data |  Planned    
 
 
@@ -25,6 +25,16 @@ Phase | Component     |  Description    | Status
 └── 📁Storysmyth
     └── 📁data
         ├── fantasy_names.csv
+    └── 📁data-pipeline
+        ├── __ini__.py
+        └── dataset.py
+    └── 📁tokenizer
+        └── 📁tests
+            ├── __init__.py
+            ├── test_character_tokenizer.py
+        ├── __init__.py
+        └── character_tokenizer.py
+    └── .gitignore
     └── README.md
 ```
 
@@ -50,7 +60,14 @@ Converts raw name strings into sequences of tokens for the model, and converts t
 - Encoding raises a KeyError on unknown characters
 - Vocabulary is saved as a json file `token_to_id`
 ### Data Pipeline
-Planned
+Loads the names from `data/fantasy_names.csv`, encodes them using the tokenizer and prepares them as fixed length token ID sequences for training.
+#### Design Decisions:
+- Special Toekns PAD, BOS and EOS are intrduced at this stage. They are defined as constants in CharacterToeknizer class with reserved IDs - `PAD=0`, `BOS=1` and `EOS=2`
+- `fit()` reserves the IDs 0, 1 and 2 for special tokens before building the vocabulary and then regular tokens are assigned IDs from 3.
+- `race: name` format is kept as is. The model learns that after `:` character names appear.
+- Each sequence is formatted as `encode([BOS]+race:name+[EOS])`
+- All sequences are padded with `PAD` on the right to match the longest sequence in the dataset.
+- The output is a list of equal length Python lists of integers.
 ### Model
 Planned
 ### Training
