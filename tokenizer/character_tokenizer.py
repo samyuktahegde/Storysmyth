@@ -1,20 +1,38 @@
 import json
+from typing import Dict
 
 class CharacterTokenizer:
+
+    BOS = 1
+    EOS = 2
+    PAD = 0
 
     def __init__(self):
         self._token_to_id = {}
         self._id_to_token = {}
         self._fitted = False
 
+    def _add_special_tokens(self):
+        self._token_to_id = {
+            "<PAD>": CharacterTokenizer.PAD,
+            "<BOS>": CharacterTokenizer.BOS,
+            "<EOS>": CharacterTokenizer.EOS
+        }
+
     def fit(self, corpus):
+        self._token_to_id = {}
+        self._id_to_token = {}
+        self._add_special_tokens()
         unique_characters = sorted(set("".join(corpus)))
-        self._token_to_id = {char: idx for idx, char in enumerate(unique_characters)}
+        self._token_to_id.update({char: idx for idx, char in enumerate(unique_characters, start=3)})
         self._id_to_token = {idx: char for char, idx in self._token_to_id.items()}
         self._fitted = True
 
-    def get_vocabulary(self):
-        return dict(self._token_to_id)
+    def get_vocabulary(self, include_special:bool=True)-> Dict[str, int]:
+        if include_special:
+            return dict(self._token_to_id)
+        special_keys = {"<PAD>", "<BOS>", "<EOS>"}
+        return {k: v for k, v in self._token_to_id.items() if k not in special_keys}
 
     def _require_fitted(self):
         if not self._fitted:
