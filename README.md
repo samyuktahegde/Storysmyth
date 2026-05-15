@@ -39,11 +39,11 @@ Phase | Component     |  Description    | Status
         ├── __init__.py
         └── character_tokenizer.py
     └── 📁data_pipeline
-    └── 📁tests
+        └── 📁tests
+            ├── __init__.py
+            ├── test_dataset.py
         ├── __init__.py
-        ├── test_dataset.py
-    ├── __init__.py
-    └── dataset.py
+        └── dataset.py
     └── .gitignore
     └── README.md
 ```
@@ -93,6 +93,10 @@ Loads the names from `data/fantasy_names.csv`, encodes them using the tokenizer 
 - There is no PyTorch dependency at this stage. `__len__` and `__getitem__` mirror the interface DataLoader will eventually expect.
 - The output is a list of equal length Python lists of integers.
 ### Model
-Planned
+-
 ### Training
-Planned
+-
+### Generator
+-
+### Interface
+-
