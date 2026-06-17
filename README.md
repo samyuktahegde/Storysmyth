@@ -18,10 +18,11 @@ Phase | Component     |  Description    | Status
 |---|---|---|---|
 1     |  Tokenizer     |  Convert names to integers and back | ✅ Done
 2     |  Data Pipeline      |  Load, clean, encode, and batch training data |  🔄 In Progress    
-3     |  Model      | - | -
-4     |  Training      | - | -
-5     |  Generator      | - | -
-6     |  Interface      | - | -
+3     |  LSTM Model      | Character-level LSTM Language Model | Not Started
+4     |  Transformer Model      | - | -
+5     |  Training      | - | -
+6     |  Generator      | - | -
+7     |  Interface      | - | -
 
 
 ## Project Structure
@@ -44,6 +45,14 @@ Phase | Component     |  Description    | Status
             ├── test_dataset.py
         ├── __init__.py
         └── dataset.py
+    └── 📁model
+        └── 📁lstm
+            └── 📁tests
+                ├── __init__.py
+                ├── test_lstm.py
+            ├── __init__.py
+            ├── lstm.py
+        └── __init__.py
     └── .gitignore
     └── README.md
 ```
@@ -92,11 +101,20 @@ Loads the names from `data/fantasy_names.csv`, encodes them using the tokenizer 
 - As of now, batching is out of scope. The `NameDataSet` prepares individual sequences.
 - There is no PyTorch dependency at this stage. `__len__` and `__getitem__` mirror the interface DataLoader will eventually expect.
 - The output is a list of equal length Python lists of integers.
-### Model
--
+### LSTM Model
+A character-level LSTM language model hat takes a sequence of token IDs and predicts the next token at each position. This is a baseline model before the transformer is introduced in Phase 4.
+#### Design Decisions:
+- PyTorch is introduced as a dependency starting in this phase. Phases 1 and 2 remain in pure Python.
+- NameLSTM subclasses torch.nn.module.
+- Three components are wired in sequence - embedding layer-> LSTM layer -> linear projection.
+- Configurable hyperparameters at construction time: vocab_size, embed_dim, hidden_dim, num_layers.
+- num_layers defaults to 1.
+- Output is raw logits of shape (batch_size, seq_len, vocab_size) - softmax and loss are left to the training loop.
+- Hidden state is initialised to zeros at the start of each forward pass.
+### Transformer Model
 ### Training
--
+
 ### Generator
--
+
 ### Interface
--
+
