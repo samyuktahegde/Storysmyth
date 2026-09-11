@@ -17,8 +17,8 @@ It takes a corpus of fantasy names, learns the patterns and generates similar na
 Phase | Component     |  Description    | Status
 |---|---|---|---|
 1     |  Tokenizer     |  Convert names to integers and back | ✅ Done
-2     |  Data Pipeline      |  Load, clean, encode, and batch training data |  ✅  In Progress    
-3     |  LSTM Model      | Character-level LSTM Language Model | Not Started
+2     |  Data Pipeline      |  Load, clean, encode, and batch training data | ✅ Done  
+3     |  LSTM Model      | Character-level LSTM Language Model | 🔄 In Progress   
 4     |  Transformer Model      | - | -
 5     |  Training      | - | -
 6     |  Generator      | - | -
