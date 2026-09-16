@@ -18,9 +18,9 @@ Phase | Component     |  Description    | Status
 |---|---|---|---|
 1     |  Tokenizer     |  Convert names to integers and back | ✅ Done
 2     |  Data Pipeline      |  Load, clean, encode, and batch training data | ✅ Done  
-3     |  LSTM Model      | Character-level LSTM Language Model | 🔄 In Progress   
+3     |  LSTM Model      | Character-level LSTM Language Model |   ✅ Done 
 4     |  Transformer Model      | - | -
-5     |  Training      | - | -
+5     |  Training      | Train the model on the name corpus | 🔄 In Progress
 6     |  Generator      | - | -
 7     |  Interface      | - | -
 
@@ -111,8 +111,18 @@ A character-level LSTM language model hat takes a sequence of token IDs and pred
 - num_layers defaults to 1.
 - Output is raw logits of shape (batch_size, seq_len, vocab_size) - softmax and loss are left to the training loop.
 - Hidden state is initialised to zeros at the start of each forward pass.
+
 ### Transformer Model
 ### Training
+Trains NameLSTM on the name corpus, evaluates on a validation split after each epoch, and saves model weights to disk.
+#### Design Decisions:
+- Loss function is nn.CrossEntropyLoss — standard for next token prediction
+- Optimiser is Adam — reliable default that adapts learning rate per parameter, works well for character-level models without extensive tuning
+- Dataset is split 90/10 into train and validation sets
+- Batch size, number of epochs, and learning rate are configurable — defaults are 32, 50, and 0.001 respectively
+- DataLoader is introduced here to handle batching and shuffling
+- Model weights are saved to checkpoints/ at the end of each epoch
+- TDD where it makes sense — loss computation and checkpoint saving are tested; the loop as a whole is not
 
 ### Generator
 
