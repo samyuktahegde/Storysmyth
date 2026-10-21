@@ -1,6 +1,7 @@
 import csv
 from curses import raw
 import warnings
+import torch
 
 from tokenizer.character_tokenizer import CharacterTokenizer
 
@@ -43,7 +44,7 @@ class NameDataset:
     def __getitem__(self, index):
         if index < 0 or index >= len(self._sequences):
             raise IndexError(f"Index {index} is out of range for dataset of size {len(self._sequences)}.")
-        return self._sequences[index]
+        return torch.tensor(self._sequences[index])
 
     def __len__(self):
         return len(self._sequences)

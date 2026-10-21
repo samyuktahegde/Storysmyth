@@ -19,9 +19,9 @@ Phase | Component     |  Description    | Status
 1     |  Tokenizer     |  Convert names to integers and back | ✅ Done
 2     |  Data Pipeline      |  Load, clean, encode, and batch training data | ✅ Done  
 3     |  LSTM Model      | Character-level LSTM Language Model |   ✅ Done 
-4     |  Transformer Model      | - | -
-5     |  Training      | Train the model on the name corpus | 🔄 In Progress
-6     |  Generator      | - | -
+4     |  Transformer Model      | - | 📋 Planned
+5     |  Training      | Train the model on the name corpus |  ✅ Done
+6     |  Generator      | Generate new names from the trained model | 🔄 In Progress
 7     |  Interface      | - | -
 
 
@@ -53,6 +53,18 @@ Phase | Component     |  Description    | Status
             ├── __init__.py
             ├── lstm.py
         └── __init__.py
+    └── 📁training
+        └── 📁tests
+            ├── __init__.py
+            ├── test_train.py
+        ├── __init__.py
+        └── train.py
+    └── 📁generator
+        └── 📁tests
+            ├── __init__.py
+            └── test_generator.py
+        ├── __init__.py
+        └── generator.py
     └── .gitignore
     └── README.md
 ```
@@ -125,6 +137,16 @@ Trains NameLSTM on the name corpus, evaluates on a validation split after each e
 - TDD where it makes sense — loss computation and checkpoint saving are tested; the loop as a whole is not
 
 ### Generator
+Loads a trained `NameLSTM` checkpoint and generates fantasy names character by character using temperature sampling.
+#### Design Decisions:
+- Prompt a race prefix - eg. `elf:` - encoded with `<BOS>` prepended at generation time.
+- Generation is autoregressive - the model predicts one token at a time, each prediction is appended to the sequence and fed back in.
+- Next token is selected via temperature sampling - logits are divided by temperature before applying softax and sampling.
+- Default temperature is `1.0` - values below 1.0 produce more conservative names, values above 1.0 produce more creative ones.
+- Generation stops at `EOS` or a configurable max length, default 50.
+- `<BOS>`, `<EOS>` and `<PAD>` are stripped from the final output.
+- Model is set to eval() mode during generation - no gradient computation
+- Checkpoint is loaded via torch,load and applied to a fresh NameLSTM instance via `load_state_dict`
 
 ### Interface
 

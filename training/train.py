@@ -40,7 +40,7 @@ def validate_epoch(model, val_loader, criterion):
     model.eval()
     total_loss = 0
 
-    with torch.n_grad():
+    with torch.no_grad():
         for batch in val_loader:
             inputs = batch[:,:-1]
             targets = batch[:,1:]
@@ -67,3 +67,9 @@ def train(file_path, tokenizer, epochs=50, batch_size=32, lr=0.001):
         val_loss = validate_epoch(model, val_loader, criterion)
         checkpoint_path = save_checkpoint(model, epoch)
         print(f"Epoch {epoch:02d}: Train Loss: {train_loss:.4f}, Val Loss: {val_loss:.4f}, Checkpoint saved at: {checkpoint_path}")
+
+if __name__ == "__main__":
+    from tokenizer.character_tokenizer import CharacterTokenizer
+    tokenizer = CharacterTokenizer()
+    tokenizer.fit(open("data/fantasy_names.csv").read().splitlines()[1:])
+    train("data/fantasy_names.csv", tokenizer)
