@@ -21,8 +21,8 @@ Phase | Component     |  Description    | Status
 3     |  LSTM Model      | Character-level LSTM Language Model |   ✅ Done 
 4     |  Transformer Model      | - | 📋 Planned
 5     |  Training      | Train the model on the name corpus |  ✅ Done
-6     |  Generator      | Generate new names from the trained model | 🔄 In Progress
-7     |  Interface      | - | -
+6     |  Generator      | Generate new names from the trained model | ✅ Done 
+7     |  Interface      | Command-line interface to generate names | ✅ Done 
 
 
 ## Project Structure
@@ -65,6 +65,12 @@ Phase | Component     |  Description    | Status
             └── test_generator.py
         ├── __init__.py
         └── generator.py
+    └── 📁interface
+        └── 📁tests
+            ├── __init__.py
+            ├── test_app.py
+        ├── __init__.py
+        └── app.py
     └── .gitignore
     └── README.md
 ```
@@ -81,11 +87,31 @@ Columns | Description | Example
 The `name` column includes a race prefix separated by a colon from the character name so that it becomes easy to condition the model while training. The `elf:` prefix will produce elvish sounding names.
 
 ## Usage
+### Generate a name
+```
+bash
+python3 -m interface.app --race elf
+python3 -m interface.app --race human --temperature 0.5
+python3 -m interface.app --race elf --run checkpoints/run2 --epoch 30
+```
+
+### Train a name
+```
+python
+from tokenizer.character_tokenizer import CharacterTokenizer
+from training.train import train
+
+tokenizer = CharacterTokenizer()
+tokenizer.fit(open("data/fantasy_names.csv").read().splitlines()[1:])
+train("data/fantasy_names.csv", tokenizer, "checkpoints/run2")
+```
+
 ### Run tests
 ```
 bash
 python3 -m pytest tokenizer/tests -v
 python3 -m pytest data_pipeline/tests -v
+python3 -m pytest -v
 ```
 
 ## Components
@@ -149,4 +175,20 @@ Loads a trained `NameLSTM` checkpoint and generates fantasy names character by c
 - Checkpoint is loaded via torch,load and applied to a fresh NameLSTM instance via `load_state_dict`
 
 ### Interface
+A minimal command-line interface that prints one generated name and exits.
 
+#### Options
+Flag | Default     |  Description 
+|---|---|---|
+`--race` | required | Race prefix the name is generated for, e.g. `human`, `elf`, `dwarf`, `halfling`
+`--run` | `checkpoints/run1` | Run folder holding the checkpoints and `tokenizer.json`
+`--epoch` | 50 | Which epoch's checkpoint to load
+`--temperature` | `1.0` | Lower is more conservative, higher is more creative
+
+#### Design Decisions
+- Built with `argparse`.
+- A trained model and its tokenizer are one unit. A checkpoint stores only weights, which depend on the exact character-to-ID table used in training. The CLI loads `tokenizer.json` from the run folder instead of rebuilding it from the CSV, so editing `data/fantasy_names.csv` later cannot silently break an older run.
+- The model is sized from the loaded tokenizer's `vocabulary_size`.
+- The prompt is `<race>:`, e.g. `elf:` passed to the existing generator.
+- Race values are not validated. A race not in the training data still runs, but the output is unreliable. 
+- `load_model` and `generate` from the generator are reused as they are. Tests replace them with fakes to check the wiring without real weights.

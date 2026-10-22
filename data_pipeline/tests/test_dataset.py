@@ -10,6 +10,7 @@ import warnings
 import pytest
 from tokenizer.character_tokenizer import CharacterTokenizer
 from data_pipeline import NameDataset
+import torch
 
 SAMPLE_CSV = """name,race
 elf:Aeloria,elf
@@ -55,8 +56,8 @@ def test_len(dataset):
 
 def test_getitem_returns_list_of_ints(dataset):
     sequence = dataset[0]
-    assert isinstance(sequence, list)
-    assert all(isinstance(i, int) for i in sequence)
+    assert isinstance(sequence, torch.Tensor)
+    assert sequence.dtype == torch.long
 
 def test_getitem_out_of_range(dataset):
     with pytest.raises(IndexError):
@@ -116,7 +117,7 @@ def test_all_sequences_same_length(dataset):
 
 def test_padding_is_on_the_right(dataset):
     for i in range(len(dataset)):
-        sequence = dataset[i]
+        sequence = dataset[i].tolist()
         if CharacterTokenizer.PAD in sequence:
             first_pad = sequence.index(CharacterTokenizer.PAD)
             assert all(t == CharacterTokenizer.PAD for t in sequence[first_pad + 1:]), \

@@ -55,7 +55,9 @@ def save_checkpoint(model, epoch, checkpoint_dir="checkpoints"):
     torch.save(model.state_dict(), path)
     return path
 
-def train(file_path, tokenizer, epochs=50, batch_size=32, lr=0.001):
+def train(file_path, tokenizer, run_dir, epochs=50, batch_size=32, lr=0.001):
+    os.makedirs(run_dir, exist_ok=True)
+    tokenizer.save(os.path.join(run_dir, "tokenizer.json"))
     train_loader, val_loader = load_data(file_path, tokenizer, batch_size)
     vocab_size = tokenizer.vocabulary_size
     model = NameLSTM(vocab_size=vocab_size, embed_dim=32, hidden_dim=64)
@@ -65,11 +67,11 @@ def train(file_path, tokenizer, epochs=50, batch_size=32, lr=0.001):
     for epoch in range(1, epochs + 1):
         train_loss = train_epoch(model, train_loader, optimizer, criterion)
         val_loss = validate_epoch(model, val_loader, criterion)
-        checkpoint_path = save_checkpoint(model, epoch)
+        checkpoint_path = save_checkpoint(model, epoch, run_dir)
         print(f"Epoch {epoch:02d}: Train Loss: {train_loss:.4f}, Val Loss: {val_loss:.4f}, Checkpoint saved at: {checkpoint_path}")
 
 if __name__ == "__main__":
     from tokenizer.character_tokenizer import CharacterTokenizer
     tokenizer = CharacterTokenizer()
     tokenizer.fit(open("data/fantasy_names.csv").read().splitlines()[1:])
-    train("data/fantasy_names.csv", tokenizer)
+    train("data/fantasy_names.csv", tokenizer, "checkpoints/run2")
