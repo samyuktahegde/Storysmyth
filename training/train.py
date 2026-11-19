@@ -18,7 +18,7 @@ def build_optimizer(model, lr = 0.001):
     return torch.optim.Adam(model.parameters(), lr=lr)
 
 def build_criterion():
-    return torch.nn.CrossEntropyLoss()
+    return torch.nn.CrossEntropyLoss(ignore_index=0)
 
 def train_epoch(model, train_loader, optimizer, criterion):
     model.train()

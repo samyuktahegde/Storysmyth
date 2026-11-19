@@ -27,6 +27,16 @@ def test_build_criterion_returns_cross_entropy():
     criterion = build_criterion()
     assert isinstance(criterion, torch.nn.CrossEntropyLoss)
 
+def test_criterion_ignores_padding():
+    criterion = build_criterion()
+    logits = torch.randn(4, 6)
+    targets = torch.tensor([3,4,5,3])
+    loss_without_pad = criterion(logits, targets)
+
+    logits_padded = torch.cat([logits, torch.randn(2,6)])
+    targets_padded = torch.cat([targets, torch.tensor([0,0])])
+    assert torch.allclose(criterion(logits_padded, targets_padded), loss_without_pad)
+
 def test_train_saves_tokenizer_and_checkpoints_in_run_dir(tmp_path):
     csv = tmp_path /"fantasy_names.csv"
     rows = ["name, race"]+[f"elf:Loia{i}, elf" for i in range(10)]
